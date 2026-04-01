@@ -1,0 +1,631 @@
+/* src/index.css */
+
+/* Reset + base global */
+@import "./shared/styles/global.css";
+
+/* Tokens de tema (light / dark) */
+@import "./shared/styles/theme.css";
+
+/* --------------------------------------------------
+   Ajustes globais específicos do app
+   -------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Títulos base */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Parágrafos */
+p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Inputs e selects (base consistente) */
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+/* Foco acessível */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.12);
+  outline-offset: 2px;
+}
+
+/* Links */
+a:hover {
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------
+   Helpers úteis no app inteiro
+   -------------------------------------------------- */
+
+.full-height {
+  height: 100%;
+}
+
+.page {
+  padding: 16px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+/* --------------------------------------------------
+   Dashboard
+   -------------------------------------------------- */
+
+.dash {
+  --sidebar-w: 280px;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+
+  /* ✅ evita bug de 100vh no mobile (Safari/Chrome) */
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  /* ✅ importante: grids com charts precisam permitir shrink */
+  min-width: 0;
+
+  background: linear-gradient(
+    180deg,
+    var(--bg-base, #1d2128) 0%,
+    var(--bg-base-2, #1b1f26) 100%
+  );
+}
+
+/* Sidebar */
+.dash__sidebar {
+  background: linear-gradient(
+    180deg,
+    var(--bg-sidebar, #252a33),
+    var(--bg-sidebar-2, #21252d)
+  );
+  border-right: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  padding: 18px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  /* ✅ evita overflow de grid no mobile */
+  min-width: 0;
+}
+
+/* Área principal */
+.dash__main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+
+  /* ✅ crítico p/ Recharts e grids: permite o filho encolher */
+  min-height: 0;
+}
+
+/* Topbar */
+.dash__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  background: rgba(31, 35, 43, 0.65);
+  backdrop-filter: blur(10px);
+
+  /* ✅ evita quebra feia em telas pequenas */
+  gap: 12px;
+  min-width: 0;
+}
+
+.dash__content {
+  padding: 22px;
+  display: grid;
+  gap: 18px;
+
+  /* ✅ crítico: conteúdo em grid com charts precisa de min-height:0 */
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Branding */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  min-width: 0;
+}
+
+.brand__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(108, 124, 255, 0.18);
+  color: var(--accent, #6c7cff);
+  font-weight: 800;
+}
+
+.brand__name {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Navegação */
+.navTitle {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.9px;
+}
+
+.navItem {
+  width: 100%;
+  text-align: left;
+
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.navItem--active {
+  background: rgba(108, 124, 255, 0.14);
+  border-color: rgba(108, 124, 255, 0.25);
+  color: var(--text-primary);
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  font-size: 12px;
+  color: rgba(169, 176, 189, 0.7);
+}
+
+/* Topbar itens */
+.pageTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Busca */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  padding: 8px 10px;
+  border-radius: 12px;
+  min-width: 260px;
+
+  /* ✅ permite encolher no mobile */
+  max-width: 100%;
+}
+
+.search__icon {
+  color: var(--text-secondary);
+}
+
+.search__input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+/* Pills */
+.pill {
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+}
+
+.pill--ok {
+  color: var(--success, #36d399);
+  border-color: rgba(54, 211, 153, 0.25);
+  background: rgba(54, 211, 153, 0.08);
+}
+
+/* Cards */
+.card {
+  background: linear-gradient(
+    180deg,
+    var(--bg-surface, #2b303a),
+    var(--bg-surface-2, #2e3440)
+  );
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius, 14px);
+  box-shadow: var(--shadow, 0 10px 24px rgba(0, 0, 0, 0.25));
+
+  padding: 16px;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Grade de KPIs */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+/* KPI */
+.kpi__label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.kpi__value {
+  margin-top: 10px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--text-primary);
+}
+
+.kpi__unit {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.kpi__hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(169, 176, 189, 0.75);
+}
+
+/* Seções */
+.section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.section__title {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+/* Botão */
+.btn {
+  border: 1px solid rgba(108, 124, 255, 0.25);
+  background: rgba(108, 124, 255, 0.15);
+  color: var(--text-primary);
+
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: rgba(108, 124, 255, 0.22);
+}
+
+/* Responsivo */
+@media (max-width: 1100px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .dash {
+    grid-template-columns: 1fr; /* main ocupa tudo */
+  }
+
+  .dash__sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+  }
+
+  .dash__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 40;
+  }
+
+  .dash__content {
+    padding: 14px; /* reduz no mobile */
+  }
+}
+
+@media (max-width: 760px) {
+  .dash__content {
+    display: flex;          /* em vez de grid */
+    flex-direction: column; /* empilha */
+    gap: 14px;
+  }
+
+  /* garante que cards ocupem 100% e não tentem ficar lado a lado */
+  .dash__content > * {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Grid da página de telemetria */
+.telemetryGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr; /* mobile */
+}
+
+/* Coluna direita */
+.telemetryRightCol {
+  display: grid;
+  gap: 14px;
+}
+
+/* Desktop */
+@media (min-width: 900px) {
+  .telemetryGrid {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
+
+  .telemetryRightCol {
+    position: sticky;
+    top: 16px; /* melhor que 0 (respira do topbar) */
+  }
+}
+
+/* Mobile: NÃO usar sticky */
+@media (max-width: 899px) {
+  .telemetryRightCol {
+    position: static;
+  }
+}
+
+
+/* ==================================================
+   Sidebar – ajuste de contraste (fix definitivo)
+   ================================================== */
+
+.dash__sidebar {
+  --text-secondary: #c2c8d0;
+}
+
+.dash__sidebar .navTitle,
+.dash__sidebar .navItem {
+  color: var(--text-secondary);
+}
+
+.dash__sidebar .navItem--active {
+  color: var(--text-primary);
+}
+
+/* ⚠️ DEBUG: isso força tudo branco na sidebar.
+   Se já está OK, recomendo REMOVER esse bloco. */
+.dash__sidebar * {
+  color: #e6eaf2 !important;
+}
+
+/* ==================================================
+   Topbar – contraste correto
+   ================================================== */
+
+.dash__topbar {
+  --topbar-text: #e6eaf2;
+  --topbar-muted: #b3bac5;
+}
+
+.dash__topbar .pageTitle {
+  color: var(--topbar-text);
+}
+
+.dash__topbar .search__icon {
+  color: var(--topbar-muted);
+}
+
+.dash__topbar .search__input {
+  color: var(--topbar-text);
+}
+
+.dash__topbar .search__input::placeholder {
+  color: var(--topbar-muted);
+}
+
+.dash__topbar .pill {
+  color: var(--topbar-muted);
+}
+
+.dash__topbar .pill--ok {
+  color: var(--success, #36d399);
+}
+
+/* ==================================================
+   Conteúdo – textos e hierarquia
+   ================================================== */
+
+.dash__content {
+  --content-text: #e6eaf2;
+  --content-muted: #b3bac5;
+}
+
+.dash__content .section__title {
+  color: var(--content-text);
+}
+
+.dash__content .kpi__label,
+.dash__content .kpi__unit,
+.dash__content .kpi__hint {
+  color: var(--content-muted);
+}
+
+.dash__content .card {
+  color: var(--content-text);
+}
+
+/* ==================================================
+   TelemetryOverviewPage – header/typography
+   ================================================== */
+
+   .telemetryPage {
+  padding: 16px;
+}
+
+/* PC / padrão: 2 colunas */
+.telemetryGrid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.telemetrySide {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+/* Mobile: 1 coluna, sidebar vira bloco normal */
+@media (max-width: 900px) {
+  .telemetryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .telemetrySide {
+    position: static;
+    top: auto;
+  }
+}
+
+
+.dashPage {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.dashHeader {
+  display: grid;
+  gap: 8px;
+}
+
+.telemetryTitle {
+  margin: 0;
+  color: #e6eaf2;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.assetTag {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9aa2b1;
+}
+
+.meta {
+  display: grid;
+  gap: 4px;
+  color: #cfd5df;
+  font-size: 13px;
+}
+
+.metaLabel {
+  color: #9aa2b1;
+  font-weight: 600;
+}
+
+.metaValue {
+  color: #cfd5df;
+}
+
+.dash .dash__content .telemetryTitle {
+  color: #e6eaf2 !important;
+}
+.dash .dash__content .telemetryTitle .assetTag {
+  color: #9aa2b1 !important;
+}

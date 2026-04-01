@@ -1,0 +1,64 @@
+{
+  "compilerOptions": {
+    /* -----------------------------
+       Linguagem e ambiente
+       ----------------------------- */
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+
+    /* -----------------------------
+       Módulos
+       ----------------------------- */
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    /* -----------------------------
+       Tipos globais (Node + Vite)
+       ----------------------------- */
+    "types": ["node", "vite/client"],
+
+    /* -----------------------------
+       React + JSX
+       ----------------------------- */
+    "jsx": "react-jsx",
+
+    /* -----------------------------
+       Type checking (estrito, mas prático)
+       ----------------------------- */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    /* -----------------------------
+       Paths e aliases
+       ----------------------------- */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* -----------------------------
+       Qualidade de código
+       ----------------------------- */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* -----------------------------
+       Interop
+       ----------------------------- */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

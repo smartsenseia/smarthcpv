@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: DOCKER/frontend.Dockerfile
+    container_name: mdis_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: DOCKER/backend.Dockerfile
+    container_name: mdis_backend
+    restart: always
+    expose:
+      - "8000"
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - worker
+
+  worker:
+    build:
+      context: .
+      dockerfile: DOCKER/worker.Dockerfile
+    container_name: mdis_worker
+    restart: always
+    volumes:
+      - ./logs:/app/logs
+      - ./ALGORITHMS_AND_DATA:/app/ALGORITHMS_AND_DATA
+      - ./DATABASE:/app/DATABASE
+    environment:
+      - PYTHONUNBUFFERED=1

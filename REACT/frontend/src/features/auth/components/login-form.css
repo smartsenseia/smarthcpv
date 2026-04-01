@@ -1,0 +1,142 @@
+/* src/features/auth/components/login-form.css */
+
+.loginShell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(120, 70, 255, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 80% 30%, rgba(0, 200, 255, 0.18), transparent 55%),
+    radial-gradient(900px 600px at 50% 90%, rgba(0, 255, 170, 0.10), transparent 60%),
+    linear-gradient(180deg, #070A12 0%, #05060B 100%);
+  color: #E9EEFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.loginGlow {
+  position: absolute;
+  inset: -200px;
+  background: conic-gradient(
+    from 180deg,
+    rgba(120, 70, 255, 0.10),
+    rgba(0, 200, 255, 0.10),
+    rgba(0, 255, 170, 0.08),
+    rgba(120, 70, 255, 0.10)
+  );
+  filter: blur(60px);
+  opacity: 0.6;
+  animation: spin 16s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(10, 12, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  padding: 22px;
+  position: relative;
+}
+
+.loginHeader {
+  margin-bottom: 16px;
+}
+
+.loginBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(233, 238, 255, 0.75);
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.loginTitle {
+  margin: 12px 0 6px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.loginSubtitle {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(233, 238, 255, 0.70);
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  color: rgba(233, 238, 255, 0.72);
+}
+
+.input {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #E9EEFF;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 80ms ease;
+}
+
+.input::placeholder {
+  color: rgba(233, 238, 255, 0.35);
+}
+
+.input:focus {
+  border-color: rgba(0, 200, 255, 0.45);
+  box-shadow:
+    0 0 0 4px rgba(0, 200, 255, 0.14),
+    0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.input:active {
+  transform: translateY(1px);
+}
+
+.errorBox {
+  font-size: 13px;
+  color: #FFD6D6;
+  background: rgba(255, 40, 60, 0.12);
+  border: 1px solid rgba(255, 40, 60, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.loginFooter {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(233, 238, 255, 0.55);
+}
+
+.hint {
+  color: rgba(233, 238, 255, 0.80);
+}
