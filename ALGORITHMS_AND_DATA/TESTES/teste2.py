@@ -5,7 +5,7 @@ import time
 
 MODBUS_CONFIG = {
     # Serial
-    "port": "/dev/ttyUSB1",
+    "port": "/dev/ttyUSB0",
     "baudrate": 19200,
     "bytesize": 8,
     "parity": "N",
@@ -39,5 +39,5 @@ def testar_portas_analogicas(slave_id, start_address: int = 0, num_entradas: int
 
 if __name__ == "__main__":
     while True:
-        testar_portas_analogicas(slave_id=2)
+        testar_portas_analogicas(slave_id=1)
         time.sleep(2)

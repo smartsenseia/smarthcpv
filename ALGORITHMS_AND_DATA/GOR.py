@@ -1,19 +1,29 @@
 import requests
 import math
+from collections import deque
 import CoolProp.CoolProp as CP
-from .CALOR import Q as QClass  # <- nome claro
+from .CALOR import Q as QClass
 from .Config_modbus import MODBUS_CONFIG
+
 
 class GOR:
     API_URL = "http://localhost:8000/api/v1/endpoints/"
 
-    def __init__(self, modbus_kw=MODBUS_CONFIG, unit_id=1, addr=0, count=4,
-                 rho=997.0, G=9.80665, AB=0.058, params=None):
-
+    def __init__(
+        self,
+        modbus_kw=MODBUS_CONFIG,
+        unit_id=1,
+        addr=0,
+        count=4,
+        rho=997.0,
+        G=9.80665,
+        AB=0.058,
+        params=None
+    ):
         self.params = params or {"_sort": "id", "_order": "desc", "_limit": 1}
 
-        # ⚠️ Evite abrir Modbus aqui: GOR não precisa dele.
-        # Removi self.fp = FP(...)
+        # histórico das 3 últimas leituras de GOR
+        self.gor_history = deque(maxlen=5)
 
         print("Objeto GOR inicializado com sucesso.")
 
@@ -25,9 +35,9 @@ class GOR:
             data = r.json()
             if not data:
                 return None
+
             d = data[-1] if isinstance(data, list) else data
 
-            # coersões defensivas
             def f(x, default=None):
                 try:
                     return float(x)
@@ -39,9 +49,9 @@ class GOR:
                 "Tsh": f(d.get("temp_2")),
                 "Tec": f(d.get("temp_3")),
                 "Tsc": f(d.get("temp_4")),
-                # se vier None, tratamos no calcular_gor (vira 0.0)
                 "fluxo_permeado": f(d.get("fluxo_permeado"), default=None),
             }
+
         except requests.RequestException as e:
             print(f"Erro ao buscar os dados da API: {e}")
             return None
@@ -67,19 +77,22 @@ class GOR:
             Tsc = Tsc if Tsc is not None else t.get("Tsc")
             fluxo_permeado = fluxo_permeado if fluxo_permeado is not None else t.get("fluxo_permeado")
 
-        # validações explícitas (evita KeyError oculto)
         missing = [n for n, v in [("Teh", Teh), ("Tsh", Tsh), ("Tec", Tec), ("Tsc", Tsc)] if v is None]
         if missing:
             raise KeyError(f"Faltam campos de temperatura: {', '.join(missing)}")
 
         # correções de temperatura
-        Teh = float(Teh); Tsh = float(Tsh); Tec = float(Tec); Tsc = float(Tsc)
+        Teh = float(Teh)
+        Tsh = float(Tsh)
+        Tec = float(Tec)
+        Tsc = float(Tsc)
+
         TCEH = 0.0084 * Teh + 1.0374 + Teh
         TCSH = 0.0103 * Tsh + 0.9666 + Tsh
         TCEC = 0.0066 * Tec + 1.0170 + Tec
         TCSC = 0.0132 * Tsc + 0.9686 + Tsc
 
-        TP = ( (TCEH + TCSH) / 2.0 + (TCEC + TCSC) / 2.0 ) / 2.0
+        TP = (((TCEH + TCSH) / 2.0) + ((TCEC + TCSC) / 2.0)) / 2.0
 
         rho, HLV = self._water_props_at_T(TP)
         if rho is None or HLV is None:
@@ -92,10 +105,10 @@ class GOR:
             fluxo_lph = 0.0
 
         # lph → m³/s
-        L=0.29
-        H=0.2
-        A=L*H
-        VP = ((fluxo_lph / 1000)/3600)*A
+        L = 0.29
+        H = 0.2
+        A = L * H
+        VP = ((fluxo_lph / 1000) / 3600) * A
 
         M = VP * rho  # kg/s
 
@@ -103,7 +116,7 @@ class GOR:
         q_obj = QClass()
         q_res = q_obj.Q()
         Q_hot = 0.0
-        
+
         if isinstance(q_res, dict):
             try:
                 Q_hot = float(q_res.get("Q", 0.0))
@@ -111,12 +124,20 @@ class GOR:
                 Q_hot = 0.0
         elif isinstance(q_res, (int, float)):
             Q_hot = float(q_res)
-        print("HLV",HLV)
-        print("M",M)
-        print("QHOT",Q_hot)
-        GOR = (M * HLV) / Q_hot if abs(Q_hot) > 1e-12 else 0.0
-        if not math.isfinite(GOR):
-            GOR = 0.0
 
-        print(f"(GOR): {GOR:.4f} ")
-        return {"GOR": GOR}
+        print("HLV", HLV)
+        print("M", M)
+        print("QHOT", Q_hot)
+
+        gor_val = (M * HLV) / Q_hot if abs(Q_hot) > 1e-12 else 0.0
+        if not math.isfinite(gor_val):
+            gor_val = 0.0
+
+        # armazena o GOR instantâneo
+        self.gor_history.append(gor_val)
+
+        # média das 3 últimas leituras de GOR
+        gor_medio = sum(self.gor_history) / len(self.gor_history)
+
+        print(f"(GOR): {gor_medio:.4f}")
+        return {"GOR": gor_medio}

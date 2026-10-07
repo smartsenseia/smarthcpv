@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Optional
+from collections import deque
 
 import httpx
 import numpy as np
@@ -17,12 +18,18 @@ from .SEC import SEC
 
 API_URL = "http://localhost:8000/api/v1/endpoints/post"
 
+# histórico das 3 últimas leituras de condutividade
+_cond_history = deque(maxlen=3)
+
+
 # ==========================================================
-# SERIAL: retorna condutividade (uS/cm) ou None
+# SERIAL: retorna condutividade média (uS/cm) ou None
 # ==========================================================
 def ler_dados_serial_usb() -> Optional[float]:
     """
-    Lê uma linha da porta serial e extrai condutividade em uS/cm.
+    Lê uma linha da porta serial, extrai a condutividade em uS/cm
+    e retorna a média das 5 últimas leituras válidas.
+
     Aceita 'uS/cm' e 'mS/cm' (convertendo mS/cm -> uS/cm).
     """
     try:
@@ -45,12 +52,18 @@ def ler_dados_serial_usb() -> Optional[float]:
         if unit == "mS/cm":
             val *= 1000.0
 
-        return val  # uS/cm
+        # armazena leitura instantânea válida
+        _cond_history.append(val)
+
+        # média das 5 últimas leituras válidas
+        cond_media = sum(_cond_history) / len(_cond_history)
+
+        print(f"Condutividade: {cond_media:.4f} uS/cm")
+        return cond_media
 
     except Exception as e:
         print(f"❌ Serial: erro lendo condutividade: {e}")
         return None
-
 
 # ==========================================================
 # GOR / SEC: wrappers
@@ -110,7 +123,7 @@ def ler_dados_modbus(
     try:
         # slave=2: precisamos de 9 regs (usa v1[8])
         r1 = client.read_holding_registers(address=0, count=9, slave=2)
-        
+
         # slave=1: 4 regs (pressão permeado em v2[3])
         r2 = client.read_holding_registers(address=0, count=4, slave=1)
 
@@ -131,9 +144,9 @@ def ler_dados_modbus(
 
     # 2) Processamento (mantive sua lógica)
     pressao1 = (v1[2] / 4000.0) * 100.0
-    pressao2 = (v1[3] / 4000.0) * 100.0
+    pressao2 = (v1[8] / 4000.0) * 100.0
     pressao3 = (v1[5] / 4000.0) * 100.0
-    pressao4 = (v1[8] / 4000.0) * 100.0
+    pressao4 = (v1[3] / 4000.0) * 100.0
 
     temp_1 = v1[1] / 33.5
     temp_2 = v1[4] / 33.5
@@ -167,7 +180,7 @@ def ler_dados_modbus(
         "pressao_5": pressao_permeado,  # permeado
         "fluxo_permeado": fp_val,
 
-        # IMPORTANTE: não ler serial aqui; usa valor do orquestrador
+        # agora este valor já pode vir como média das 3 últimas leituras
         "condhot": condhot_uScm,
 
         "gor": gor_val,

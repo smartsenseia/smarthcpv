@@ -1,4 +1,4 @@
-tunnel: smartsense-dashboard
+tunnel: 875177a4-403c-4fba-8c45-f0febd936687
 credentials-file: /home/ramon/.cloudflared/875177a4-403c-4fba-8c45-f0febd936687.json
 
 ingress:
@@ -9,6 +9,3 @@ ingress:
     service: http://127.0.0.1:8000
 
   - service: http_status:404
-
-
-

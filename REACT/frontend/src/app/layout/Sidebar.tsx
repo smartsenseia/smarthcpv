@@ -23,17 +23,26 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
         flex: "0 0 auto",
         willChange: mobile ? "transform" : "width",
 
-        // 👇 mobile overlay
         position: mobile ? "fixed" : undefined,
         top: mobile ? 0 : undefined,
         left: mobile ? 0 : undefined,
         height: mobile ? "100dvh" : undefined,
         zIndex: mobile ? 50 : undefined,
-        transform: mobile ? (isOpen ? "translateX(0)" : "translateX(-110%)") : undefined,
-        boxShadow: mobile ? "0 18px 48px rgba(0,0,0,0.45)" : undefined,
+
+        transform: mobile
+          ? isOpen
+            ? "translateX(0)"
+            : "translateX(-110%)"
+          : undefined,
+
+        boxShadow: mobile
+          ? "0 18px 48px rgba(0,0,0,0.45)"
+          : undefined,
       }}
     >
-      {/* Branding */}
+      {/* =========================
+          BRANDING
+      ========================== */}
       <div
         className="brand"
         style={{
@@ -44,7 +53,13 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
           minHeight: 44,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
           <div className="brand__logo">S</div>
 
           <div
@@ -81,8 +96,17 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
         )}
       </div>
 
+      {/* =========================
+          BOTÃO EXPANDIR
+      ========================== */}
       {collapsed && (
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 6 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 6,
+          }}
+        >
           <button
             type="button"
             onClick={onToggle}
@@ -102,6 +126,9 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
         </div>
       )}
 
+      {/* =========================
+          NAVIGATION
+      ========================== */}
       <div
         className="navTitle"
         style={{
@@ -114,25 +141,65 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
         NAVIGATION
       </div>
 
-      <SidebarLink to="/telemetry" label="Dashboard" collapsed={collapsed} />
+      <SidebarLink
+        to="/telemetry"
+        label="Dashboard"
+        collapsed={collapsed}
+      />
 
+      {/* =========================
+          CAMERA
+      ========================== */}
       <div
         className="navTitle"
         style={{
           opacity: collapsed ? 0 : 1,
-          height: 18,
+          height: collapsed ? 0 : 18,
           overflow: "hidden",
           transition: "opacity 120ms ease",
+          marginTop: collapsed ? 0 : 14,
         }}
       >
-        Machines
+        CAMERA
       </div>
 
-      <SidebarLink to="/machine-1" label="Machine 1" disabled collapsed={collapsed} />
-      <SidebarLink to="/machine-2" label="Machine 2" disabled collapsed={collapsed} />
-      <SidebarLink to="/machine-3" label="Machine 3" disabled collapsed={collapsed} />
-      <SidebarLink to="/machine-4" label="Machine 4" disabled collapsed={collapsed} />
+      <div
+        style={{
+          padding: collapsed ? "8px 6px" : "10px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: collapsed ? 52 : "100%",
+            height: collapsed ? 52 : 125,
+            borderRadius: 10,
+            overflow: "hidden",
+            background: "#111827",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src="/camera"
+            alt="Camera Hikvision"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </div>
+      </div>
 
+      {/* =========================
+          FOOTER
+      ========================== */}
       <div
         className="sidebarFooter"
         style={{
@@ -148,6 +215,9 @@ function Sidebar({ collapsed, onToggle, mobile = false }: SidebarProps) {
   );
 }
 
+/* =========================
+   SIDEBAR LINK
+========================= */
 function SidebarLink({
   to,
   label,
@@ -182,7 +252,9 @@ function SidebarLink({
     <NavLink
       to={to}
       title={label}
-      className={({ isActive }) => `navItem ${isActive ? "navItem--active" : ""}`}
+      className={({ isActive }) =>
+        `navItem ${isActive ? "navItem--active" : ""}`
+      }
       style={{
         display: "flex",
         justifyContent: collapsed ? "center" : "flex-start",

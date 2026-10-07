@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 import requests
-# Importações necessárias para a classe SEC (se for o caso)
-# from .Config_modbus import MODBUS_CONFIG 
-from .CALOR import Q as QClass 
+from collections import deque
+from .CALOR import Q as QClass
+
 
 class SEC:
     """
     Classe para calcular o Consumo Específico de Energia (SEC).
+
+    Nesta versão, o valor retornado/transmitido de SEC é a média móvel
+    das 3 últimas leituras calculadas de SEC.
     """
     API_URL = "http://localhost:8000/api/v1/endpoints/"
 
     def __init__(self, params=None):
         self.params = params or {"_sort": "id", "_order": "desc", "_limit": 1}
         self.q_obj = QClass()
-        self.Q_hot = self._get_Q_hot()
+
+        # histórico das 3 últimas leituras de SEC
+        self.sec_history = deque(maxlen=5)
+
         print("Objeto SEC inicializado com sucesso.")
 
     def _get_Q_hot(self):
@@ -41,6 +47,7 @@ class SEC:
             data = r.json()
             if not data:
                 return None
+
             d = data[-1] if isinstance(data, list) else data
 
             def f(x, default=None):
@@ -58,39 +65,45 @@ class SEC:
     def calcular_sec(self):
         """
         Calcula o Consumo Específico de Energia (SEC).
-        A unidade de Q_hot é J/s, e o fluxo de permeado é L/h.
-        O SEC será em J/m³.
+
+        Q_hot é obtido em J/s.
+        O fluxo de permeado é lido da API.
+        O valor retornado é a média das 3 últimas leituras de SEC calculadas.
         """
-        # Obter o fluxo de permeado da API
         fluxo_permeado = self.get_fluxo()
 
         if fluxo_permeado is None or fluxo_permeado <= 0:
             print("Não foi possível obter um valor válido de fluxo de permeado ou o valor é zero.")
             return None
-        
-         # 1. Calcular a Área (A)
 
-        L = 0.29 # Comprimento em metros
-        H = 0.2 # Altura em metros
+        # Atualiza Q_hot a cada cálculo
+        Q_hot = self._get_Q_hot()
 
+        # 1. Calcular a Área (A)
+        L = 0.29  # Comprimento em metros
+        H = 0.2   # Altura em metros
         A = L * H
 
-        # Convertendo o fluxo de L/h para m³/s
-      
+        # Mantido como no seu código original
         fluxo = fluxo_permeado * A
 
+        # Evita divisão por zero
+        if abs(fluxo * 1000) < 1e-12:
+            print("Fluxo inválido para cálculo do SEC.")
+            return None
 
-        # O cálculo do SEC é a energia total (Q_hot) dividida pela vazão volumétrica
-        # Q_hot (J/s) / vazao_volumetrica (m³/s) = J/m³
-        
-        SEC_value = self.Q_hot / (fluxo*1000)
+        # SEC instantâneo
+        sec_val = Q_hot / (fluxo * 1000)
 
-        print(f"SEC: {SEC_value:.4f} J/m³")
+        # armazena a leitura instantânea
+        self.sec_history.append(sec_val)
 
-        # A área (A) e as variáveis L e H não são necessárias neste cálculo de SEC
-        # porque a vazão volumétrica (V) já é fornecida.
+        # média das 3 últimas leituras de SEC
+        sec_medio = sum(self.sec_history) / len(self.sec_history)
 
-        return SEC_value
+        print(f"SEC: {sec_medio:.4f} J/m³")
+        return sec_medio
+
 
 # Exemplo de uso:
 if __name__ == "__main__":

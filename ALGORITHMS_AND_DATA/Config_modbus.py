@@ -2,7 +2,7 @@
 
 MODBUS_CONFIG = {
     # Serial
-    "port": "/dev/ttyUSB0",
+    "port": "/dev/ttyUSB1",
     "baudrate": 19200,
     "bytesize": 8,
     "parity": "N",

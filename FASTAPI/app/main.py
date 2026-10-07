@@ -62,9 +62,38 @@ print(f"🔎 Procurando React build em: {FRONTEND_DIST}")
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     ico = FRONTEND_DIST / "favicon.ico"
-    if ico.is_file():
-        return FileResponse(ico, media_type="image/x-icon")
+
+    # Serve o favicon.ico se existir
+    if ico.is_file() and ico.stat().st_size > 0:
+        return FileResponse(
+            path=ico,
+            media_type="image/x-icon"
+        )
+
+    # Fallback para o SVG
+    svg = FRONTEND_DIST / "favicon.svg"
+    if svg.is_file() and svg.stat().st_size > 0:
+        return FileResponse(
+            path=svg,
+            media_type="image/svg+xml"
+        )
+
     return Response(status_code=204)
+
+
+@app.get("/favicon.svg", include_in_schema=False)
+async def favicon_svg():
+    svg = FRONTEND_DIST / "favicon.svg"
+
+    if svg.is_file() and svg.stat().st_size > 0:
+        return FileResponse(
+            path=svg,
+            media_type="image/svg+xml"
+        )
+
+    return Response(status_code=204)
+
+
 
 assets_dir = FRONTEND_DIST / "assets"
 if assets_dir.is_dir():
